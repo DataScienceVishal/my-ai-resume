@@ -296,26 +296,28 @@
             if (!text) return;
 
             let matchedKey = "default";
-            if (text.includes("goal") || text.includes("2026")) matchedKey = "goals";
-            else if (text.includes("teleperformance") || text.includes("pipeline") || text.includes("migrate")) matchedKey = "teleperformance";
-            else if (text.includes("azure") || text.includes("cloud")) matchedKey = "azure";
-            else if (text.includes("skill") || text.includes("toolkit") || text.includes("stack")) matchedKey = "skills";
-            else if (text.includes("interview") || text.includes("schedule") || text.includes("contact") || text.includes("meet")) matchedKey = "interview";
-            else if (text.includes("northeastern") || text.includes("research") || text.includes("uni") || text.includes("study")) matchedKey = "northeastern";
-            else if (text.includes("experience") || text.includes("years")) matchedKey = "experience";
-            else if (text.includes("databricks")) matchedKey = "databricks";
-            else if (text.includes("sql") || text.includes("query")) matchedKey = "sql";
-            else if (text.includes("python") || text.includes("programming")) matchedKey = "python";
-            else if (text.includes("avant") || text.includes("garde")) matchedKey = "avantgarde";
-            else if (text.includes("notice") || text.includes("available") || text.includes("start")) matchedKey = "notice";
-            else if (text.includes("visa") || text.includes("work authorization") || text.includes("right to work")) matchedKey = "visa";
-            else if (text.includes("relocate") || text.includes("location")) matchedKey = "relocation";
-            else if (text.includes("llm") || text.includes("large language")) matchedKey = "llm";
-            else if (text.includes("house") || text.includes("prediction")) matchedKey = "houseproject";
-            else if (text.includes("stakeholder") || text.includes("expectations")) matchedKey = "stakeholders";
-            else if (text.includes("education") || text.includes("degree") || text.includes("master")) matchedKey = "education";
-            else if (text.includes("team") || text.includes("collaborate")) matchedKey = "team";
-            else if (text.includes("hire") || text.includes("why you")) matchedKey = "hybrid";
+            
+            // Advanced contextual matching hooks
+            if (text.includes("goal") || text.includes("2026") || text.includes("future") || text.includes("objective")) matchedKey = "goals";
+            else if (text.includes("teleperformance") || text.includes("migrate") || text.includes("impact") || text.includes("tp")) matchedKey = "teleperformance";
+            else if (text.includes("azure") || text.includes("adf") || text.includes("cloud") || text.includes("factory")) matchedKey = "azure";
+            else if (text.includes("skill") || text.includes("toolkit") || text.includes("stack") || text.includes("technologies") || text.includes("languages")) matchedKey = "skills";
+            else if (text.includes("interview") || text.includes("schedule") || text.includes("contact") || text.includes("meet") || text.includes("call") || text.includes("hire")) matchedKey = "interview";
+            else if (text.includes("northeastern") || text.includes("research") || text.includes("uni") || text.includes("study") || text.includes("london")) matchedKey = "northeastern";
+            else if (text.includes("experience") || text.includes("years") || text.includes("background") || text.includes("tenure")) matchedKey = "experience";
+            else if (text.includes("databricks") || text.includes("spark") || text.includes("cluster")) matchedKey = "databricks";
+            else if (text.includes("sql") || text.includes("query") || text.includes("database") || text.includes("schema")) matchedKey = "sql";
+            else if (text.includes("python") || text.includes("programming") || text.includes("coding") || text.includes("script")) matchedKey = "python";
+            else if (text.includes("avant") || text.includes("garde") || text.includes("commercial")) matchedKey = "avantgarde";
+            else if (text.includes("notice") || text.includes("available") || text.includes("start") || text.includes("joining")) matchedKey = "notice";
+            else if (text.includes("visa") || text.includes("work authorization") || text.includes("right to work") || text.includes("graduate route")) matchedKey = "visa";
+            else if (text.includes("relocate") || text.includes("location") || text.includes("move")) matchedKey = "relocation";
+            else if (text.includes("llm") || text.includes("large language") || text.includes("rag") || text.includes("langchain")) matchedKey = "llm";
+            else if (text.includes("house") || text.includes("prediction") || text.includes("real estate") || text.includes("regression")) matchedKey = "houseproject";
+            else if (text.includes("stakeholder") || text.includes("expectations") || text.includes("manage") || text.includes("communication")) matchedKey = "stakeholders";
+            else if (text.includes("education") || text.includes("degree") || text.includes("master") || text.includes("qualification") || text.includes("university")) matchedKey = "education";
+            else if (text.includes("team") || text.includes("collaborate") || text.includes("agile") || text.includes("cross-functional")) matchedKey = "team";
+            else if (text.includes("why you") || text.includes("edge") || text.includes("value") || text.includes("differentiate")) matchedKey = "hybrid";
 
             chatInput.value = '';
             handleInquiry(text, matchedKey);
