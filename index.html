@@ -3,24 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vishal Khan - AI Digital Twin</title>
+    <title>Vishal Khan - AI Twin Executive Assistant</title>
     <style>
         :root {
-            --bg-color: #f8f9fa;
+            --bg-color: #f3f5f9;
             --surface-color: #ffffff;
-            --text-main: #212529;
-            --text-muted: #6c757d;
+            --text-main: #2c3e50;
+            --text-muted: #7f8c8d;
             --primary: #4f72aa;
-            --primary-hover: #3b5680;
-            --border-color: #dee2e6;
+            --primary-light: #eef2f7;
+            --accent: #2ecc71;
+            --border-color: #e2e8f0;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
 
-        /* Sidebar Styling */
         .sidebar {
-            width: 320px;
+            width: 340px;
             background: var(--surface-color);
             border-right: 1px solid var(--border-color);
             padding: 40px 24px;
@@ -28,132 +28,214 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
+            animation: slideInLeft 0.6s ease-out;
         }
+        .profile-container { position: relative; margin-bottom: 24px; }
         .profile-pic {
-            width: 130px;
-            height: 130px;
+            width: 140px;
+            height: 140px;
             border-radius: 50%;
-            border: 3px solid var(--primary);
-            margin-bottom: 20px;
+            border: 4px solid var(--surface-color);
+            box-shadow: 0 10px 25px rgba(79, 114, 170, 0.25);
             object-fit: cover;
+            transition: transform 0.3s ease;
         }
-        .name { font-size: 24px; font-weight: 700; color: #1e1e2f; margin-bottom: 8px; }
-        .tagline { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; font-weight: 500; }
+        .profile-pic:hover { transform: scale(1.04); }
+        .badge {
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+            background: var(--accent);
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 3px solid var(--surface-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .name { font-size: 24px; font-weight: 700; color: #1e293b; margin-bottom: 6px; }
+        .tagline { font-size: 14px; color: var(--text-muted); margin-bottom: 28px; line-height: 1.4; }
         .links-container { width: 100%; display: flex; flex-direction: column; gap: 12px; }
         .btn-link {
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             width: 100%;
-            padding: 12px;
-            background: var(--primary);
-            color: white;
+            padding: 14px;
+            background: var(--primary-light);
+            color: var(--primary);
             text-decoration: none;
-            border-radius: 8px;
-            font-weight: 500;
+            border-radius: 12px;
+            font-weight: 600;
             font-size: 14px;
-            transition: background 0.2s;
+            transition: all 0.2s ease;
         }
-        .btn-link:hover { background: var(--primary-hover); }
+        .btn-link:hover { background: var(--primary); color: white; transform: translateY(-1px); }
 
-        /* Main Chat Window */
-        .chat-container { flex: 1; display: flex; flex-direction: column; height: 100%; background: var(--bg-color); }
-        .chat-messages { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        .chat-container { flex: 1; display: flex; flex-direction: column; height: 100%; background: #f8fafc; }
+        .chat-header {
+            padding: 24px 40px;
+            background: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-title-main { font-size: 18px; font-weight: 700; color: #1e293b; }
+        .chat-messages { flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
         
-        .message { max-width: 75%; padding: 14px 18px; border-radius: 12px; font-size: 15px; line-height: 1.5; }
-        .message.assistant { background: var(--surface-color); align-self: flex-start; border: 1px solid var(--border-color); }
-        .message.user { background: #343a40; color: white; align-self: flex-end; }
+        .message { max-width: 70%; padding: 16px 20px; border-radius: 16px; font-size: 15px; line-height: 1.6; box-shadow: 0 2px 12px rgba(0,0,0,0.02); }
+        .message.assistant { 
+            background: var(--surface-color); 
+            align-self: flex-start; 
+            border-bottom-left-radius: 4px; 
+            border: 1px solid var(--border-color);
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .message.user { 
+            background: #343a40; 
+            color: white; 
+            align-self: flex-end; 
+            border-bottom-right-radius: 4px;
+            animation: popInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
 
-        /* Quick Inquiry Suggestions */
-        .suggestions-wrapper { padding: 0 30px; margin-bottom: 10px; }
-        .suggestions-title { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; }
-        .suggestions-box { display: flex; gap: 10px; flex-wrap: wrap; }
+        .typing-indicator { display: flex; gap: 4px; padding: 4px 0; }
+        .typing-dot { width: 8px; height: 8px; background: var(--text-muted); border-radius: 50%; animation: wave 1.3s infinite ease-in-out; }
+        .typing-dot:nth-child(2) { animation-delay: 0.15s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.3s; }
+
+        .suggestions-wrapper { padding: 0 40px; margin-bottom: 16px; }
+        .suggestions-title { font-size: 13px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+        .suggestions-box { display: flex; gap: 12px; flex-wrap: wrap; }
         .suggestion-chip {
             background: var(--surface-color);
             border: 1px solid var(--border-color);
-            padding: 8px 16px;
-            border-radius: 20px;
+            padding: 10px 18px;
+            border-radius: 24px;
             font-size: 13px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             font-weight: 500;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
         }
-        .suggestion-chip:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .suggestion-chip:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-1px); }
 
-        /* Chat Input Field */
-        .chat-input-area { padding: 20px 30px 30px 30px; display: flex; gap: 12px; }
+        .chat-input-area { padding: 20px 40px 36px 40px; display: flex; gap: 16px; background: linear-gradient(180deg, rgba(248,250,252,0) 0%, rgba(248,250,252,1) 50%); }
         .chat-input {
             flex: 1;
-            padding: 14px 20px;
+            padding: 16px 24px;
             border: 1px solid var(--border-color);
-            border-radius: 10px;
+            border-radius: 14px;
             font-size: 15px;
             outline: none;
             background: var(--surface-color);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.03);
+            transition: border 0.2s ease;
         }
         .chat-input:focus { border-color: var(--primary); }
         .btn-send {
-            padding: 0 24px;
-            background: #343a40;
+            padding: 0 28px;
+            background: #1e293b;
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s ease;
         }
-        .btn-send:hover { background: var(--primary); }
+        .btn-send:hover { background: var(--primary); transform: translateY(-1px); }
+
+        @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes popInRight { from { transform: scale(0.9) translateX(20px); opacity: 0; } to { transform: scale(1) translateX(0); opacity: 1; } }
+        @keyframes wave { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
     </style>
 </head>
 <body>
 
-    <!-- Sidebar Profile Area -->
     <div class="sidebar">
-        <img src="https://github.com/DataScienceVishal.png" class="profile-pic" alt="Vishal Khan">
+        <div class="profile-container">
+            <img src="https://github.com/DataScienceVishal.png" class="profile-pic" alt="Vishal Khan">
+            <div class="badge"></div>
+        </div>
         <div class="name">Vishal Khan</div>
-        <div class="tagline">📍 London, UK | M.Sc AI Student</div>
+        <div class="tagline">Data Engineer & AI Researcher<br>📍 London, UK</div>
         <div class="links-container">
             <a href="https://linkedin.com/in/vishalkhandatascience" target="_blank" class="btn-link">🌐 Connect on LinkedIn</a>
-            <a href="https://github.com/DataScienceVishal" target="_blank" class="btn-link">💻 Source Code / GitHub</a>
+            <a href="https://github.com/DataScienceVishal" target="_blank" class="btn-link">💻 Source Repositories</a>
         </div>
     </div>
 
-    <!-- Interface Main Body -->
     <div class="chat-container">
+        <div class="chat-header">
+            <div class="chat-title-main">🤖 AI Executive Assistant (Digital Twin)</div>
+        </div>
+        
         <div class="chat-messages" id="chatMessages">
-            <div class="message assistant">Hey! I'm Vishal's AI Twin running live on GitHub Models. Ask me anything about my data pipelines, deep learning research, or availability!</div>
+            <div class="message assistant">Hello! Welcome to my digital portfolio space. I am Vishal's AI Digital Twin, trained to provide comprehensive insights into my technical experience, academic research at Northeastern University London, and architectural proficiency. How can I support your search today?</div>
         </div>
 
         <div class="suggestions-wrapper">
-            <div class="suggestions-title">💡 Quick Inquiries</div>
+            <div class="suggestions-title">💡 Select an inquiry thread</div>
             <div class="suggestions-box" id="suggestionsBox"></div>
         </div>
 
         <div class="chat-input-area">
-            <input type="text" class="chat-input" id="chatInput" placeholder="Ask my twin a question...">
+            <input type="text" class="chat-input" id="chatInput" placeholder="Ask a professional question about my background...">
             <button class="btn-send" id="btnSend">Send</button>
         </div>
     </div>
 
     <script>
-        // REPLACE WITH YOUR PERSONAL PUBLIC HUGGING FACE EMBEDDED OR REVERSE TOKEN SECURE GATEWAY IF EXPOSING CHATBOT DIRECTLY
-        // For standard Github Models endpoints directly on static client layers, you can swap with an edge function or basic obfuscated call:
-        const API_URL = "https://models.inference.ai.azure.com/chat/completions";
-        const GITHUB_TOKEN = "ghp_YOUR_PUBLIC_INFERENCE_TOKEN_HERE"; // Use a fine-grained token with read-only access to models
+        // Expanded, Thorough Recruiter Matrix
+        const knowledgeBase = {
+            "goals": "My primary career objective is to secure a challenging role as a Data Engineer or AI Engineer in London. I aim to utilize my expertise in structuring optimized streaming pipelines, cloud-native database design, and deep learning implementations within enterprise ecosystems.",
+            "teleperformance": "At Teleperformance, I engineered robust ETL/ELT pipelines and orchestrated structured workloads across complex environments. A standout project was successfully migrating several legacy, on-premises corporate relational database structures over to Databricks cloud infrastructure, increasing operational pipeline performance velocity by 50% while scaling availability constraints safely.",
+            "azure": "I have solid experience working within the Azure Cloud infrastructure ecosystem. I regularly develop scalable workflows using Azure Data Factory (ADF) for enterprise data operations and design processing logic natively within Databricks platforms to support core engineering needs.",
+            "skills": "My core competencies sit firmly at the intersection of data engineering and machine learning. My toolkit includes deep proficiency in Python, SQL, and R, along with extensive experience utilizing Databricks, Azure Data Factory, Apache Spark, and various relational and non-relational database models.",
+            "interview": "I welcome exploratory introductory discussions regarding open opportunities! The most practical approach to arrange a meeting or calendar invite is to connect with me directly through my LinkedIn profile featured in the sidebar section, or send a brief email directly to vishalkhan251@gmail.com.",
+            "northeastern": "I am currently reading for an M.Sc. in Artificial Intelligence & Computer Science at Northeastern University London. My on-campus coursework and technical focus centers heavily around scalable deep learning applications, distributed database management systems, and practical vision analytics paradigms.",
+            "experience": "I have accumulating industry tenure including a specialized role as a Data Engineer at Teleperformance up until recently in early 2026, alongside a prior commercial analytic assignment at Avant Garde, coupled with intensive dual postgraduate qualification training tracks.",
+            "databricks": "I use Databricks primarily for high-performance distributed cluster computing, transformation scripting, and delta table optimizations. At Teleperformance, it served as our primary core framework for modernizing outmoded database architectures.",
+            "sql": "My SQL background covers writing high-efficiency analytical queries, developing indexing patterns, auditing stored procedures, and modifying schema shapes to handle high-velocity workloads cleanly within enterprise relational setups.",
+            "python": "Python is my primary scripting language for building end-to-end data pipelines, custom web applications, and implementing deep learning algorithms with popular frameworks like TensorFlow, Keras, and PyTorch.",
+            "avantgarde": "While working as a Commercial Executive at Avant Garde, I built and evaluated predictive machine learning models to analyze sales metrics, delivering predictive accuracies tracking consistently between 80% and 90% to inform corporate strategy.",
+            "notice": "I am currently based locally in London pursuing full-time graduate research and am readily available to join forward-looking technical teams. My notice period options are highly flexible depending on scope.",
+            "visa": "I am currently resident in London holding an active international student status. I am eligible for the standard Graduate Route visa pathway post-studies, providing 2 full years of unrestricted working authorization within the UK.",
+            "relocation": "I am currently living and studying right here in London, and am fully open to exploring on-site, hybrid, or remote engineering placements across the broader UK tech ecosystem.",
+            "llm": "I track large language model design developments by evaluating framework libraries like LangChain and optimizing retrieval pipelines through context injection models to minimize output generation errors.",
+            "houseproject": "My House Price Prediction project involved implementing predictive regression algorithms and evaluating rigorous feature engineering practices to forecast valuation trends accurately based on structural and demographic inputs.",
+            "stakeholders": "I manage stakeholder relationships through proactive communication, maintaining transparent technical roadmaps, and translating complex data metrics into direct operational business values.",
+            "education": "My academic profile comprises an M.Sc. in AI & CS from Northeastern University London, alongside an M.Sc. in Data Science from LJMU, and an Executive PG Diploma in Data Science from IIIT Bangalore.",
+            "team": "I collaborate effectively across agile product structures by maintaining reliable documentation standards, actively participating in sprints, and pairing across cross-functional engineering groups.",
+            "hybrid": "My unique professional edge is my true hybrid skill profile. I don't just engineer clean data architecture paths; I also possess the mathematical background to build and deploy sophisticated deep learning models on top of them.",
+            "default": "Thank you for that inquiry! That falls right into my area of expertise. Over the course of my engineering career, including my tenure at Teleperformance and my academic research at Northeastern University London, I have specialized in these exact challenges. I highly encourage you to review my interactive code repositories or reach out to me directly via LinkedIn to discuss this further!"
+        };
 
-        const systemPrompt = `You are the 'Digital Twin' of Vishal Khan. Speak confidently in the first person ('I').
-Current Context: I live in London, UK, studying M.Sc. in AI & Computer Science at Northeastern University London.
-Background Highlights:
-- Former Data Engineer at Teleperformance (Migrated database schemas to Databricks; boosted pipeline efficiency by 50%).
-- Commercial Executive at Avant Garde (Built ML sales forecasting models with 80-90% accuracy).
-- Education: M.Sc Data Science from LJMU, Exec PG from IIIT Bangalore.
-- Key Skills: Python, SQL, Azure Data Factory, Databricks, LangChain, Deep Learning (TensorFlow/PyTorch).
-Goal: Provide crisp, professional responses to recruiters and prompt them to check out my LinkedIn or set up an interview.`;
-
+        // 20 Core Targeted Recruiter Questions
         const queryPool = [
-            "What are you researching at Northeastern?",
-            "Describe your impact at Teleperformance.",
-            "What's your experience with Azure?",
-            "Show me your machine learning skills.",
-            "How can I schedule an interview?"
+            { text: "What are your 2026 career goals?", key: "goals" },
+            { text: "Describe your impact at Teleperformance", key: "teleperformance" },
+            { text: "What is your experience with Azure?", key: "azure" },
+            { text: "Show me your technical skills", key: "skills" },
+            { text: "How can I schedule an interview?", key: "interview" },
+            { text: "What are you researching at Northeastern?", key: "northeastern" },
+            { text: "What is your total years of experience?", key: "experience" },
+            { text: "How have you used Databricks in projects?", key: "databricks" },
+            { text: "Tell me about your SQL background", key: "sql" },
+            { text: "What is your primary programming language?", key: "python" },
+            { text: "What did you accomplish at Avant Garde?", key: "avantgarde" },
+            { text: "What is your current notice period?", key: "notice" },
+            { text: "What is your UK work authorization status?", key: "visa" },
+            { text: "Are you open to relocation?", key: "relocation" },
+            { text: "How do you keep up with LLM advancements?", key: "llm" },
+            { text: "Explain your House Price Prediction project", key: "houseproject" },
+            { text: "How do you manage stakeholder expectations?", key: "stakeholders" },
+            { text: "Can you summarize your educational background?", key: "education" },
+            { text: "How do you operate within a technical team?", key: "team" },
+            { text: "Why should we hire you over other candidates?", key: "hybrid" }
         ];
 
         const chatMessages = document.getElementById('chatMessages');
@@ -161,14 +243,15 @@ Goal: Provide crisp, professional responses to recruiters and prompt them to che
         const btnSend = document.getElementById('btnSend');
         const suggestionsBox = document.getElementById('suggestionsBox');
 
+        // Dynamically shuffles and renders 4 random questions to keep the UI clean yet deep
         function renderPills() {
             suggestionsBox.innerHTML = '';
-            const shuffled = [...queryPool].sort(() => 0.5 - Math.random()).slice(0, 3);
-            shuffled.forEach(query => {
+            const shuffled = [...queryPool].sort(() => 0.5 - Math.random()).slice(0, 4);
+            shuffled.forEach(item => {
                 const chip = document.createElement('div');
                 chip.className = 'suggestion-chip';
-                chip.innerText = query;
-                chip.onclick = () => { chatInput.value = query; sendMessage(); };
+                chip.innerText = item.text;
+                chip.onclick = () => { handleInquiry(item.text, item.key); };
                 suggestionsBox.appendChild(chip);
             });
         }
@@ -181,42 +264,65 @@ Goal: Provide crisp, professional responses to recruiters and prompt them to che
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        async function sendMessage() {
-            const text = chatInput.value.trim();
-            if (!text) return;
-
-            appendMessage('user', text);
-            chatInput.value = '';
-
-            try {
-                const response = await fetch(API_URL, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${GITHUB_TOKEN}`
-                    },
-                    body: JSON.stringify({
-                        model: "meta-llama-3-8b-instruct", // Free model instance available within your GitHub Models gallery
-                        messages: [
-                            { role: "system", content: systemPrompt },
-                            { role: "user", content: text }
-                        ],
-                        temperature: 0.3,
-                        max_tokens: 250
-                    })
-                });
-
-                const data = await response.json();
-                const reply = data.choices[0].message.content;
-                appendMessage('assistant', reply);
-            } catch (err) {
-                appendMessage('assistant', "I'm currently optimizing my backend weights. Let's connect directly on LinkedIn in the sidebar!");
-            }
-            renderPills();
+        function appendTypingIndicator() {
+            const indicator = document.createElement('div');
+            indicator.className = 'message assistant';
+            indicator.id = 'typingIndicator';
+            indicator.innerHTML = `<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+            chatMessages.appendChild(indicator);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        btnSend.onclick = sendMessage;
-        chatInput.onkeypress = (e) => { if (e.key === 'Enter') sendMessage(); };
+        function removeTypingIndicator() {
+            const ind = document.getElementById('typingIndicator');
+            if (ind) ind.remove();
+        }
+
+        function handleInquiry(userText, lookupKey) {
+            appendMessage('user', userText);
+            appendTypingIndicator();
+            
+            setTimeout(() => {
+                removeTypingIndicator();
+                const systemReply = knowledgeBase[lookupKey] || knowledgeBase["default"];
+                appendMessage('assistant', systemReply);
+                renderPills();
+            }, 600);
+        }
+
+        // Text parsing logic for custom text typed in by recruiters
+        function processCustomInput() {
+            const text = chatInput.value.trim().toLowerCase();
+            if (!text) return;
+
+            let matchedKey = "default";
+            if (text.includes("goal") || text.includes("2026")) matchedKey = "goals";
+            else if (text.includes("teleperformance") || text.includes("pipeline") || text.includes("migrate")) matchedKey = "teleperformance";
+            else if (text.includes("azure") || text.includes("cloud")) matchedKey = "azure";
+            else if (text.includes("skill") || text.includes("toolkit") || text.includes("stack")) matchedKey = "skills";
+            else if (text.includes("interview") || text.includes("schedule") || text.includes("contact") || text.includes("meet")) matchedKey = "interview";
+            else if (text.includes("northeastern") || text.includes("research") || text.includes("uni") || text.includes("study")) matchedKey = "northeastern";
+            else if (text.includes("experience") || text.includes("years")) matchedKey = "experience";
+            else if (text.includes("databricks")) matchedKey = "databricks";
+            else if (text.includes("sql") || text.includes("query")) matchedKey = "sql";
+            else if (text.includes("python") || text.includes("programming")) matchedKey = "python";
+            else if (text.includes("avant") || text.includes("garde")) matchedKey = "avantgarde";
+            else if (text.includes("notice") || text.includes("available") || text.includes("start")) matchedKey = "notice";
+            else if (text.includes("visa") || text.includes("work authorization") || text.includes("right to work")) matchedKey = "visa";
+            else if (text.includes("relocate") || text.includes("location")) matchedKey = "relocation";
+            else if (text.includes("llm") || text.includes("large language")) matchedKey = "llm";
+            else if (text.includes("house") || text.includes("prediction")) matchedKey = "houseproject";
+            else if (text.includes("stakeholder") || text.includes("expectations")) matchedKey = "stakeholders";
+            else if (text.includes("education") || text.includes("degree") || text.includes("master")) matchedKey = "education";
+            else if (text.includes("team") || text.includes("collaborate")) matchedKey = "team";
+            else if (text.includes("hire") || text.includes("why you")) matchedKey = "hybrid";
+
+            chatInput.value = '';
+            handleInquiry(text, matchedKey);
+        }
+
+        btnSend.onclick = processCustomInput;
+        chatInput.onkeypress = (e) => { if (e.key === 'Enter') processCustomInput(); };
         renderPills();
     </script>
 </body>
