@@ -189,7 +189,7 @@
     </div>
 
     <script>
-        // Expanded, Thorough Recruiter Matrix
+        // Fallback Recruiter Matrix (Used if API limit thresholds or tokens are exhausted)
         const knowledgeBase = {
             "goals": "My primary career objective is to secure a challenging role as a Data Engineer or AI Engineer in London. I aim to utilize my expertise in structuring optimized streaming pipelines, cloud-native database design, and deep learning implementations within enterprise ecosystems.",
             "teleperformance": "At Teleperformance, I engineered robust ETL/ELT pipelines and orchestrated structured workloads across complex environments. A standout project was successfully migrating several legacy, on-premises corporate relational database structures over to Databricks cloud infrastructure, increasing operational pipeline performance velocity by 50% while scaling availability constraints safely.",
@@ -214,7 +214,6 @@
             "default": "Thank you for that inquiry! That falls right into my area of expertise. Over the course of my engineering career, including my tenure at Teleperformance and my academic research at Northeastern University London, I have specialized in these exact challenges. I highly encourage you to review my interactive code repositories or reach out to me directly via LinkedIn to discuss this further!"
         };
 
-        // 20 Core Targeted Recruiter Questions
         const queryPool = [
             { text: "What are your 2026 career goals?", key: "goals" },
             { text: "Describe your impact at Teleperformance", key: "teleperformance" },
@@ -243,7 +242,24 @@
         const btnSend = document.getElementById('btnSend');
         const suggestionsBox = document.getElementById('suggestionsBox');
 
-        // Dynamically shuffles and renders 4 random questions to keep the UI clean yet deep
+        // Track running memory conversation array state for LLM Contextual tracking
+        let chatContextHistory = [
+            {
+                role: "system",
+                content: `You are the AI Digital Twin Executive Assistant representing Vishal Khan, a highly accomplished Data Engineer and AI Researcher located in London, UK. 
+                Answer queries naturally in a polished, brief, and confident tone.
+                
+                Core Facts for alignment:
+                - Pursuing M.Sc in AI & CS at Northeastern University London.
+                - Previously Data Engineer at Teleperformance (migrated structures cleanly over to Databricks cloud infrastructure, speeding workflows up by 50%).
+                - Familiar with Azure Cloud Services (ADF, Data Factory) and Databricks clusters.
+                - Holding student visa status with eligibility for standard 2-year UK Graduate Route working paths.
+                - Email: vishalkhan251@gmail.com
+                
+                Keep answers compact, technical, and accurate to his real record.`
+            }
+        ];
+
         function renderPills() {
             suggestionsBox.innerHTML = '';
             const shuffled = [...queryPool].sort(() => 0.5 - Math.random()).slice(0, 4);
@@ -278,57 +294,90 @@
             if (ind) ind.remove();
         }
 
-        function handleInquiry(userText, lookupKey) {
+        // Live API integration method wrapper
+        // Derived from live domain observed in image_6a6c76.jpg
+        const PROXY_URL = "https://my-ai-resume-seven.vercel.app/api";
+
+        async function handleInquiry(userText, lookupKey) {
+            // Append the message to the screen visually
             appendMessage('user', userText);
+            
+            // Push it into active memory history logs for the LLM session context
+            chatContextHistory.push({ role: "user", content: userText });
+            
             appendTypingIndicator();
             
-            setTimeout(() => {
+            try {
+                // Perform live background fetch across to Vercel Gateway Node proxy
+                const response = await fetch(PROXY_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ messages: chatContextHistory })
+                });
+
+                if (!response.ok) {
+                    throw new Error("API Gateway down or throwing status exception rules.");
+                }
+
+                const data = await response.json();
                 removeTypingIndicator();
-                const systemReply = knowledgeBase[lookupKey] || knowledgeBase["default"];
-                appendMessage('assistant', systemReply);
-                renderPills();
-            }, 600);
+
+                // Extract model completion text cleanly out of standard OpenAI structural payload formatting
+                const modelReply = data.choices[0].message.content;
+                
+                appendMessage('assistant', modelReply);
+                chatContextHistory.push({ role: "assistant", content: modelReply });
+
+            } catch (error) {
+                console.warn("Falling back to local matrix due to endpoint block/delay:", error);
+                // Gracefully fallback to local data match matrix if network is blocked or key expires
+                removeTypingIndicator();
+                const fallbackReply = knowledgeBase[lookupKey] || knowledgeBase["default"];
+                appendMessage('assistant', fallbackReply);
+                chatContextHistory.push({ role: "assistant", content: fallbackReply });
+            }
+
+            renderPills();
         }
 
-        // Text parsing logic for custom text typed in by recruiters
         function processCustomInput() {
-            const text = chatInput.value.trim().toLowerCase();
-            if (!text) return;
+            const inputFieldText = chatInput.value.trim();
+            if (!inputFieldText) return;
 
+            const lowerText = inputFieldText.toLowerCase();
             let matchedKey = "default";
             
-            // Advanced contextual matching hooks
-            if (text.includes("goal") || text.includes("2026") || text.includes("future") || text.includes("objective")) matchedKey = "goals";
-            else if (text.includes("teleperformance") || text.includes("migrate") || text.includes("impact") || text.includes("tp")) matchedKey = "teleperformance";
-            else if (text.includes("azure") || text.includes("adf") || text.includes("cloud") || text.includes("factory")) matchedKey = "azure";
-            else if (text.includes("skill") || text.includes("toolkit") || text.includes("stack") || text.includes("technologies") || text.includes("languages")) matchedKey = "skills";
-            else if (text.includes("interview") || text.includes("schedule") || text.includes("contact") || text.includes("meet") || text.includes("call") || text.includes("hire")) matchedKey = "interview";
-            else if (text.includes("northeastern") || text.includes("research") || text.includes("uni") || text.includes("study") || text.includes("london")) matchedKey = "northeastern";
-            else if (text.includes("experience") || text.includes("years") || text.includes("background") || text.includes("tenure")) matchedKey = "experience";
-            else if (text.includes("databricks") || text.includes("spark") || text.includes("cluster")) matchedKey = "databricks";
-            else if (text.includes("sql") || text.includes("query") || text.includes("database") || text.includes("schema")) matchedKey = "sql";
-            else if (text.includes("python") || text.includes("programming") || text.includes("coding") || text.includes("script")) matchedKey = "python";
-            else if (text.includes("avant") || text.includes("garde") || text.includes("commercial")) matchedKey = "avantgarde";
-            else if (text.includes("notice") || text.includes("available") || text.includes("start") || text.includes("joining")) matchedKey = "notice";
-            else if (text.includes("visa") || text.includes("work authorization") || text.includes("right to work") || text.includes("graduate route")) matchedKey = "visa";
-            else if (text.includes("relocate") || text.includes("location") || text.includes("move")) matchedKey = "relocation";
-            else if (text.includes("llm") || text.includes("large language") || text.includes("rag") || text.includes("langchain")) matchedKey = "llm";
-            else if (text.includes("house") || text.includes("prediction") || text.includes("real estate") || text.includes("regression")) matchedKey = "houseproject";
-            else if (text.includes("stakeholder") || text.includes("expectations") || text.includes("manage") || text.includes("communication")) matchedKey = "stakeholders";
-            else if (text.includes("education") || text.includes("degree") || text.includes("master") || text.includes("qualification") || text.includes("university")) matchedKey = "education";
-            else if (text.includes("team") || text.includes("collaborate") || text.includes("agile") || text.includes("cross-functional")) matchedKey = "team";
-            else if (text.includes("why you") || text.includes("edge") || text.includes("value") || text.includes("differentiate")) matchedKey = "hybrid";
+            if (lowerText.includes("goal") || lowerText.includes("2026") || lowerText.includes("future")) matchedKey = "goals";
+            else if (lowerText.includes("teleperformance") || lowerText.includes("migrate") || lowerText.includes("impact")) matchedKey = "teleperformance";
+            else if (lowerText.includes("azure") || lowerText.includes("adf") || lowerText.includes("cloud")) matchedKey = "azure";
+            else if (lowerText.includes("skill") || lowerText.includes("toolkit") || lowerText.includes("stack")) matchedKey = "skills";
+            else if (lowerText.includes("interview") || lowerText.includes("schedule") || lowerText.includes("contact") || lowerText.includes("meet")) matchedKey = "interview";
+            else if (lowerText.includes("northeastern") || lowerText.includes("research") || lowerText.includes("study")) matchedKey = "northeastern";
+            else if (lowerText.includes("experience") || lowerText.includes("years") || lowerText.includes("background")) matchedKey = "experience";
+            else if (lowerText.includes("databricks") || lowerText.includes("spark")) matchedKey = "databricks";
+            else if (lowerText.includes("sql") || lowerText.includes("query") || lowerText.includes("database")) matchedKey = "sql";
+            else if (lowerText.includes("python") || lowerText.includes("programming")) matchedKey = "python";
+            else if (lowerText.includes("avant") || lowerText.includes("garde")) matchedKey = "avantgarde";
+            else if (lowerText.includes("notice") || lowerText.includes("available") || lowerText.includes("start")) matchedKey = "notice";
+            else if (lowerText.includes("visa") || lowerText.includes("right to work") || lowerText.includes("graduate route")) matchedKey = "visa";
+            else if (lowerText.includes("relocate") || lowerText.includes("location")) matchedKey = "relocation";
+            else if (lowerText.includes("llm") || lowerText.includes("large language") || lowerText.includes("rag")) matchedKey = "llm";
+            else if (lowerText.includes("house") || lowerText.includes("prediction") || lowerText.includes("regression")) matchedKey = "houseproject";
+            else if (lowerText.includes("stakeholder") || lowerText.includes("expectations")) matchedKey = "stakeholders";
+            else if (lowerText.includes("education") || lowerText.includes("degree") || lowerText.includes("master")) matchedKey = "education";
+            else if (lowerText.includes("team") || lowerText.includes("collaborate")) matchedKey = "team";
+            else if (lowerText.includes("why you") || lowerText.includes("edge") || lowerText.includes("value")) matchedKey = "hybrid";
 
             chatInput.value = '';
-            handleInquiry(text, matchedKey);
+            // Use the full input text for the model, passing matchedKey only as fallback
+            handleInquiry(inputFieldText, matchedKey);
         }
 
         btnSend.onclick = processCustomInput;
         chatInput.onkeypress = (e) => { if (e.key === 'Enter') processCustomInput(); };
         renderPills();
-
-        // 🚨 CHANGE THIS URL TARGET
-        const PROXY_URL = "https://my-ai-resume.vercel.app/api";
     </script>
 </body>
 </html>
