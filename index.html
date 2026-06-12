@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vishal Khan - AI Twin Executive Assistant</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         :root {
             --bg-color: #f3f5f9;
@@ -151,6 +152,28 @@
         @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         @keyframes popInRight { from { transform: scale(0.9) translateX(20px); opacity: 0; } to { transform: scale(1) translateX(0); opacity: 1; } }
         @keyframes wave { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+
+        .message.assistant ul {
+            margin-left: 20px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .message.assistant p {
+            margin-bottom: 12px;
+        }
+
+        .message.assistant p:last-child {
+            margin-bottom: 0;
+        }
+
+        .message.assistant strong {
+            color: #1e293b;
+            font-weight: 700;
+        }
     </style>
 </head>
 <body>
@@ -275,7 +298,15 @@
         function appendMessage(role, text) {
             const msg = document.createElement('div');
             msg.className = `message ${role}`;
-            msg.innerText = text;
+            
+            if (role === 'assistant') {
+                // Parse markdown strings dynamically into clean HTML structures
+                msg.innerHTML = marked.parse(text);
+            } else {
+                // Keep user text safe from arbitrary string evaluation injections
+                msg.innerText = text;
+            }
+            
             chatMessages.appendChild(msg);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
