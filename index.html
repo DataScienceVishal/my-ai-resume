@@ -294,8 +294,7 @@
             if (ind) ind.remove();
         }
 
-        // Live API integration method wrapper
-        // Derived from live domain observed in image_6a6c76.jpg
+        // Live API integration method wrapper - Fully CSP compliant (No eval used)
         const PROXY_URL = "https://my-ai-resume-seven.vercel.app/api";
 
         async function handleInquiry(userText, lookupKey) {
@@ -308,7 +307,7 @@
             appendTypingIndicator();
             
             try {
-                // Perform live background fetch across to Vercel Gateway Node proxy
+                // Perform a clean, native network fetch to your Vercel proxy backend
                 const response = await fetch(PROXY_URL, {
                     method: "POST",
                     headers: {
@@ -318,13 +317,13 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error("API Gateway down or throwing status exception rules.");
+                    throw new Error("API Gateway responded with an error status.");
                 }
 
                 const data = await response.json();
                 removeTypingIndicator();
 
-                // Extract model completion text cleanly out of standard OpenAI structural payload formatting
+                // Extract model completion text out of standard structural payload formatting
                 const modelReply = data.choices[0].message.content;
                 
                 appendMessage('assistant', modelReply);
@@ -332,7 +331,7 @@
 
             } catch (error) {
                 console.warn("Falling back to local matrix due to endpoint block/delay:", error);
-                // Gracefully fallback to local data match matrix if network is blocked or key expires
+                // Gracefully fallback to local data match matrix if network is blocked
                 removeTypingIndicator();
                 const fallbackReply = knowledgeBase[lookupKey] || knowledgeBase["default"];
                 appendMessage('assistant', fallbackReply);
