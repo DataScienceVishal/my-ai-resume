@@ -20,6 +20,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
 
+        /* Sidebar Container Layout Rules */
         .sidebar {
             width: 340px;
             background: var(--surface-color);
@@ -29,7 +30,7 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
-            animation: slideInLeft 0.6s ease-out;
+            flex-shrink: 0;
         }
         .profile-container { position: relative; margin-bottom: 24px; }
         .profile-pic {
@@ -74,7 +75,8 @@
         }
         .btn-link:hover { background: var(--primary); color: white; transform: translateY(-1px); }
 
-        .chat-container { flex: 1; display: flex; flex-direction: column; height: 100%; background: #f8fafc; }
+        /* Main Chat Engine Layout Configurations */
+        .chat-container { flex: 1; display: flex; flex-direction: column; height: 100%; background: #f8fafc; overflow: hidden; }
         .chat-header {
             padding: 24px 40px;
             background: var(--surface-color);
@@ -86,22 +88,21 @@
         .chat-title-main { font-size: 18px; font-weight: 700; color: #1e293b; }
         .chat-messages { flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
         
-        .message { max-width: 70%; padding: 16px 20px; border-radius: 16px; font-size: 15px; line-height: 1.6; box-shadow: 0 2px 12px rgba(0,0,0,0.02); }
+        .message { max-width: 75%; padding: 16px 20px; border-radius: 16px; font-size: 15px; line-height: 1.6; box-shadow: 0 2px 12px rgba(0,0,0,0.02); word-wrap: break-word; }
         .message.assistant { 
             background: var(--surface-color); 
             align-self: flex-start; 
             border-bottom-left-radius: 4px; 
             border: 1px solid var(--border-color);
-            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .message.user { 
             background: #343a40; 
             color: white; 
             align-self: flex-end; 
             border-bottom-right-radius: 4px;
-            animation: popInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
+        /* Typing & Live Stream Tracking Indicators */
         .typing-indicator { display: flex; gap: 4px; padding: 4px 0; }
         .typing-dot { width: 8px; height: 8px; background: var(--text-muted); border-radius: 50%; animation: wave 1.3s infinite ease-in-out; }
         .typing-dot:nth-child(2) { animation-delay: 0.15s; }
@@ -119,11 +120,10 @@
             cursor: pointer;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             font-weight: 500;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
         }
         .suggestion-chip:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-1px); }
 
-        .chat-input-area { padding: 20px 40px 36px 40px; display: flex; gap: 16px; background: linear-gradient(180deg, rgba(248,250,252,0) 0%, rgba(248,250,252,1) 50%); }
+        .chat-input-area { padding: 20px 40px 36px 40px; display: flex; gap: 16px; background: var(--surface-color); border-top: 1px solid var(--border-color); }
         .chat-input {
             flex: 1;
             padding: 16px 24px;
@@ -131,11 +131,10 @@
             border-radius: 14px;
             font-size: 15px;
             outline: none;
-            background: var(--surface-color);
-            box-shadow: 0 4px 14px rgba(0,0,0,0.03);
+            background: #f8fafc;
             transition: border 0.2s ease;
         }
-        .chat-input:focus { border-color: var(--primary); }
+        .chat-input:focus { border-color: var(--primary); background: var(--surface-color); }
         .btn-send {
             padding: 0 28px;
             background: #1e293b;
@@ -148,19 +147,41 @@
         }
         .btn-send:hover { background: var(--primary); transform: translateY(-1px); }
 
-        @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        @keyframes popInRight { from { transform: scale(0.9) translateX(20px); opacity: 0; } to { transform: scale(1) translateX(0); opacity: 1; } }
         @keyframes wave { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
 
-        /* Rich Text Layout Structuring Elements */
+        /* Rich Text Structural Layout Selectors */
         .message.assistant ul, .message.assistant ol { margin-left: 20px; margin-top: 8px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 6px; }
         .message.assistant p { margin-bottom: 12px; }
         .message.assistant p:last-child { margin-bottom: 0; }
         .message.assistant strong { color: #1e293b; font-weight: 700; }
-        .message.assistant table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+        .message.assistant table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; display: block; overflow-x: auto; }
         .message.assistant th, .message.assistant td { border: 1px solid var(--border-color); padding: 8px 12px; text-align: left; }
         .message.assistant th { background-color: var(--primary-light); color: #1e293b; }
+
+        /* 📱 ADVANCED MOBILE RESPONSIVE MEDIA BREAKPOINTS */
+        @media (max-width: 868px) {
+            body { flex-direction: column; }
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding: 24px 20px;
+            }
+            .profile-container { margin-bottom: 12px; }
+            .profile-pic { width: 80px; height: 80px; }
+            .name { font-size: 20px; }
+            .tagline { margin-bottom: 14px; }
+            .links-container { flex-direction: row; gap: 10px; }
+            .btn-link { padding: 10px; font-size: 13px; }
+            
+            .chat-header { padding: 16px 20px; }
+            .chat-messages { padding: 20px; gap: 16px; }
+            .message { max-width: 90%; padding: 12px 16px; font-size: 14px; }
+            .suggestions-wrapper { padding: 0 20px; }
+            .chat-input-area { padding: 16px; gap: 10px; }
+            .chat-input { padding: 12px 16px; font-size: 14px; }
+            .btn-send { padding: 0 18px; font-size: 14px; }
+        }
     </style>
 </head>
 <body>
@@ -173,8 +194,8 @@
         <div class="name">Vishal Khan</div>
         <div class="tagline">Data Engineer & AI Researcher<br>📍 London, UK</div>
         <div class="links-container">
-            <a href="https://linkedin.com/in/vishalkhandatascience" target="_blank" class="btn-link">🌐 Connect on LinkedIn</a>
-            <a href="https://github.com/DataScienceVishal" target="_blank" class="btn-link">💻 Source Repositories</a>
+            <a href="https://linkedin.com/in/vishalkhandatascience" target="_blank" class="btn-link">🌐 LinkedIn</a>
+            <a href="https://github.com/DataScienceVishal" target="_blank" class="btn-link">💻 GitHub</a>
         </div>
     </div>
 
@@ -323,6 +344,7 @@
             }
             chatMessages.appendChild(msg);
             chatMessages.scrollTop = chatMessages.scrollHeight;
+            return msg;
         }
 
         function appendTypingIndicator() {
@@ -337,6 +359,28 @@
         function removeTypingIndicator() {
             const ind = document.getElementById('typingIndicator');
             if (ind) ind.remove();
+        }
+
+        // Professional Token Stream Simulator Engine
+        function streamOutputText(element, rawText, processingCompleteCallback) {
+            let currentIndex = 0;
+            element.innerHTML = "";
+            
+            // Calculate a dynamic typing rate to keep longer answers feeling fluid
+            const intervalSpeed = rawText.length > 300 ? 5 : 12;
+
+            const streamTimer = setInterval(() => {
+                if (currentIndex <= rawText.length) {
+                    // Update content progressively and compile markdown live
+                    element.innerHTML = marked.parse(rawText.substring(0, currentIndex));
+                    currentIndex += 3; // Step size controls character chunk generation speed
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                } else {
+                    clearInterval(streamTimer);
+                    element.innerHTML = marked.parse(rawText); // Final definitive parse check
+                    if(processingCompleteCallback) processingCompleteCallback();
+                }
+            }, intervalSpeed);
         }
 
         const PROXY_URL = "https://my-ai-resume-seven.vercel.app/api";
@@ -359,8 +403,13 @@
                 removeTypingIndicator();
 
                 const modelReply = data.choices[0].message.content;
-                appendMessage('assistant', modelReply);
-                chatContextHistory.push({ role: "assistant", content: modelReply });
+                
+                // Initialize modern streaming layout block element
+                const activeResponseBox = appendMessage('assistant', "");
+                
+                streamOutputText(activeResponseBox, modelReply, () => {
+                    chatContextHistory.push({ role: "assistant", content: modelReply });
+                });
 
             } catch (error) {
                 console.error("Endpoint transaction issue:", error);
