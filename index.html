@@ -326,6 +326,9 @@
         btnSend.onclick = processCustomInput;
         chatInput.onkeypress = (e) => { if (e.key === 'Enter') processCustomInput(); };
         renderPills();
+
+        // 🚨 CHANGE THIS URL TARGET
+        const PROXY_URL = "https://my-ai-resume.vercel.app/api";
     </script>
 </body>
 </html>
