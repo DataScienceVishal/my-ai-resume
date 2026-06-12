@@ -1,5 +1,4 @@
 module.exports = async (req, res) => {
-    // 1. Establish robust CORS headers for your client-side assets
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -20,13 +19,11 @@ module.exports = async (req, res) => {
             return res.status(500).json({ error: "Server error: GITHUB_TOKEN environment variable is unconfigured." });
         }
 
-        // Clean up message keys so they match standard openAI structural data schemas
         const sanitizedMessages = messages.map(msg => ({
             role: msg.role === "assistant" || msg.role === "user" || msg.role === "system" ? msg.role : "user",
             content: String(msg.content)
         }));
 
-        // 2. Query the official native GitHub Models API path
         const response = await fetch("https://models.github.ai/inference/chat/completions", {
             method: "POST",
             headers: {
@@ -35,13 +32,12 @@ module.exports = async (req, res) => {
             },
             body: JSON.stringify({
                 messages: sanitizedMessages,
-                model: "openai/gpt-4.1", // Realigned to your target model choice
+                model: "openai/gpt-4.1",
                 temperature: 0.7,
                 max_tokens: 512
             })
         });
 
-        // Output error data explicitly if the token permissions fail
         if (!response.ok) {
             const errorReason = await response.text();
             console.error(`GitHub Models Endpoint rejected request [${response.status}]:`, errorReason);
