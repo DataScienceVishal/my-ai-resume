@@ -20,8 +20,13 @@ module.exports = async (req, res) => {
             return res.status(401).json({ error: "Server Configuration Error: Missing GITHUB_TOKEN" });
         }
 
-        // 2. Make a clean, native HTTP fetch request directly to the GitHub AI model endpoint
-        // This avoids importing any third-party SDKs that trigger 'eval' or CSP violations.
+        // Sanitize the messages array to ensure NO hidden metadata attributes leak through
+        const sanitizedMessages = messages.map(msg => ({
+            role: msg.role,
+            content: msg.content
+        }));
+
+        // 2. HTTP POST fetch request directly to GitHub AI Models
         const response = await fetch("https://models.inference.ai.azure.com/chat/completions", {
             method: "POST",
             headers: {
@@ -29,7 +34,7 @@ module.exports = async (req, res) => {
                 "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify({
-                messages: messages,
+                messages: sanitizedMessages,
                 model: "meta-llama-3-8b-instruct",
                 temperature: 0.7,
                 max_tokens: 512
@@ -38,17 +43,16 @@ module.exports = async (req, res) => {
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error("Upstream Model API Error response:", errorText);
-            return res.status(response.status).json({ error: `Upstream model error: ${errorText}` });
+            console.error("Upstream API Error Response Status:", response.status, errorText);
+            // Return the specific message back to help us debug exactly what it doesn't like
+            return res.status(400).json({ error: errorText });
         }
 
         const data = await response.json();
-        
-        // 3. Send the clean JSON payload back to your frontend
         return res.status(200).json(data);
 
     } catch (error) {
-        console.error("Vercel Serverless Function Error:", error);
+        console.error("Vercel Serverless Function Exception Error:", error);
         return res.status(500).json({ error: error.message });
     }
 };
