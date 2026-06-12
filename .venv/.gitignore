@@ -1,5 +1,0 @@
-.streamlit/secrets.toml
-__pycache__/
-.venv/
-.DS_Store
-faiss_index/
