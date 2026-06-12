@@ -153,27 +153,11 @@
         @keyframes popInRight { from { transform: scale(0.9) translateX(20px); opacity: 0; } to { transform: scale(1) translateX(0); opacity: 1; } }
         @keyframes wave { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
 
-        .message.assistant ul {
-            margin-left: 20px;
-            margin-top: 8px;
-            margin-bottom: 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .message.assistant p {
-            margin-bottom: 12px;
-        }
-
-        .message.assistant p:last-child {
-            margin-bottom: 0;
-        }
-
-        .message.assistant strong {
-            color: #1e293b;
-            font-weight: 700;
-        }
+        /* Rich Text Layout Structuring Elements */
+        .message.assistant ul, .message.assistant ol { margin-left: 20px; margin-top: 8px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 6px; }
+        .message.assistant p { margin-bottom: 12px; }
+        .message.assistant p:last-child { margin-bottom: 0; }
+        .message.assistant strong { color: #1e293b; font-weight: 700; }
     </style>
 </head>
 <body>
@@ -212,52 +196,27 @@
     </div>
 
     <script>
-        // Fallback Recruiter Matrix (Used if API limit thresholds or tokens are exhausted)
-        const knowledgeBase = {
-            "goals": "My primary career objective is to secure a challenging role as a Data Engineer or AI Engineer in London. I aim to utilize my expertise in structuring optimized streaming pipelines, cloud-native database design, and deep learning implementations within enterprise ecosystems.",
-            "teleperformance": "At Teleperformance, I engineered robust ETL/ELT pipelines and orchestrated structured workloads across complex environments. A standout project was successfully migrating several legacy, on-premises corporate relational database structures over to Databricks cloud infrastructure, increasing operational pipeline performance velocity by 50% while scaling availability constraints safely.",
-            "azure": "I have solid experience working within the Azure Cloud infrastructure ecosystem. I regularly develop scalable workflows using Azure Data Factory (ADF) for enterprise data operations and design processing logic natively within Databricks platforms to support core engineering needs.",
-            "skills": "My core competencies sit firmly at the intersection of data engineering and machine learning. My toolkit includes deep proficiency in Python, SQL, and R, along with extensive experience utilizing Databricks, Azure Data Factory, Apache Spark, and various relational and non-relational database models.",
-            "interview": "I welcome exploratory introductory discussions regarding open opportunities! The most practical approach to arrange a meeting or calendar invite is to connect with me directly through my LinkedIn profile featured in the sidebar section, or send a brief email directly to vishalkhan251@gmail.com.",
-            "northeastern": "I am currently reading for an M.Sc. in Artificial Intelligence & Computer Science at Northeastern University London. My on-campus coursework and technical focus centers heavily around scalable deep learning applications, distributed database management systems, and practical vision analytics paradigms.",
-            "experience": "I have accumulating industry tenure including a specialized role as a Data Engineer at Teleperformance up until recently in early 2026, alongside a prior commercial analytic assignment at Avant Garde, coupled with intensive dual postgraduate qualification training tracks.",
-            "databricks": "I use Databricks primarily for high-performance distributed cluster computing, transformation scripting, and delta table optimizations. At Teleperformance, it served as our primary core framework for modernizing outmoded database architectures.",
-            "sql": "My SQL background covers writing high-efficiency analytical queries, developing indexing patterns, auditing stored procedures, and modifying schema shapes to handle high-velocity workloads cleanly within enterprise relational setups.",
-            "python": "Python is my primary scripting language for building end-to-end data pipelines, custom web applications, and implementing deep learning algorithms with popular frameworks like TensorFlow, Keras, and PyTorch.",
-            "avantgarde": "While working as a Commercial Executive at Avant Garde, I built and evaluated predictive machine learning models to analyze sales metrics, delivering predictive accuracies tracking consistently between 80% and 90% to inform corporate strategy.",
-            "notice": "I am currently based locally in London pursuing full-time graduate research and am readily available to join forward-looking technical teams. My notice period options are highly flexible depending on scope.",
-            "visa": "I am currently resident in London holding an active international student status. I am eligible for the standard Graduate Route visa pathway post-studies, providing 2 full years of unrestricted working authorization within the UK.",
-            "relocation": "I am currently living and studying right here in London, and am fully open to exploring on-site, hybrid, or remote engineering placements across the broader UK tech ecosystem.",
-            "llm": "I track large language model design developments by evaluating framework libraries like LangChain and optimizing retrieval pipelines through context injection models to minimize output generation errors.",
-            "houseproject": "My House Price Prediction project involved implementing predictive regression algorithms and evaluating rigorous feature engineering practices to forecast valuation trends accurately based on structural and demographic inputs.",
-            "stakeholders": "I manage stakeholder relationships through proactive communication, maintaining transparent technical roadmaps, and translating complex data metrics into direct operational business values.",
-            "education": "My academic profile comprises an M.Sc. in AI & CS from Northeastern University London, alongside an M.Sc. in Data Science from LJMU, and an Executive PG Diploma in Data Science from IIIT Bangalore.",
-            "team": "I collaborate effectively across agile product structures by maintaining reliable documentation standards, actively participating in sprints, and pairing across cross-functional engineering groups.",
-            "hybrid": "My unique professional edge is my true hybrid skill profile. I don't just engineer clean data architecture paths; I also possess the mathematical background to build and deploy sophisticated deep learning models on top of them.",
-            "default": "Thank you for that inquiry! That falls right into my area of expertise. Over the course of my engineering career, including my tenure at Teleperformance and my academic research at Northeastern University London, I have specialized in these exact challenges. I highly encourage you to review my interactive code repositories or reach out to me directly via LinkedIn to discuss this further!"
-        };
-
         const queryPool = [
-            { text: "What are your 2026 career goals?", key: "goals" },
-            { text: "Describe your impact at Teleperformance", key: "teleperformance" },
-            { text: "What is your experience with Azure?", key: "azure" },
-            { text: "Show me your technical skills", key: "skills" },
-            { text: "How can I schedule an interview?", key: "interview" },
-            { text: "What are you researching at Northeastern?", key: "northeastern" },
-            { text: "What is your total years of experience?", key: "experience" },
-            { text: "How have you used Databricks in projects?", key: "databricks" },
-            { text: "Tell me about your SQL background", key: "sql" },
-            { text: "What is your primary programming language?", key: "python" },
-            { text: "What did you accomplish at Avant Garde?", key: "avantgarde" },
-            { text: "What is your current notice period?", key: "notice" },
-            { text: "What is your UK work authorization status?", key: "visa" },
-            { text: "Are you open to relocation?", key: "relocation" },
-            { text: "How do you keep up with LLM advancements?", key: "llm" },
-            { text: "Explain your House Price Prediction project", key: "houseproject" },
-            { text: "How do you manage stakeholder expectations?", key: "stakeholders" },
-            { text: "Can you summarize your educational background?", key: "education" },
-            { text: "How do you operate within a technical team?", key: "team" },
-            { text: "Why should we hire you over other candidates?", key: "hybrid" }
+            "What are your 2026 career goals?",
+            "Describe your impact at Teleperformance",
+            "What is your experience with Azure?",
+            "Show me your technical skills",
+            "How can I schedule an interview?",
+            "What are you researching at Northeastern?",
+            "What is your total years of experience?",
+            "How have you used Databricks in projects?",
+            "Tell me about your SQL background",
+            "What is your primary programming language?",
+            "What did you accomplish at Avant Garde?",
+            "What is your current notice period?",
+            "What is your UK work authorization status?",
+            "Are you open to relocation?",
+            "How do you keep up with LLM advancements?",
+            "Explain your House Price Prediction project",
+            "How do you manage stakeholder expectations?",
+            "Can you summarize your educational background?",
+            "How do you operate within a technical team?",
+            "Why should we hire you over other candidates?"
         ];
 
         const chatMessages = document.getElementById('chatMessages');
@@ -265,12 +224,11 @@
         const btnSend = document.getElementById('btnSend');
         const suggestionsBox = document.getElementById('suggestionsBox');
 
-        // Track running memory conversation array state for LLM Contextual tracking
         let chatContextHistory = [
             {
                 role: "system",
                 content: `You are the AI Digital Twin Executive Assistant representing Vishal Khan, a highly accomplished Data Engineer and AI Researcher located in London, UK. 
-                Answer queries naturally in a polished, brief, and confident tone.
+                Answer queries naturally in a polished, brief, and confident tone. Utilize Markdown formatting for bullet points and bolding where applicable.
                 
                 Core Facts for alignment:
                 - Pursuing M.Sc in AI & CS at Northeastern University London.
@@ -286,11 +244,11 @@
         function renderPills() {
             suggestionsBox.innerHTML = '';
             const shuffled = [...queryPool].sort(() => 0.5 - Math.random()).slice(0, 4);
-            shuffled.forEach(item => {
+            shuffled.forEach(text => {
                 const chip = document.createElement('div');
                 chip.className = 'suggestion-chip';
-                chip.innerText = item.text;
-                chip.onclick = () => { handleInquiry(item.text, item.key); };
+                chip.innerText = text;
+                chip.onclick = () => { handleInquiry(text); };
                 suggestionsBox.appendChild(chip);
             });
         }
@@ -300,10 +258,8 @@
             msg.className = `message ${role}`;
             
             if (role === 'assistant') {
-                // Parse markdown strings dynamically into clean HTML structures
                 msg.innerHTML = marked.parse(text);
             } else {
-                // Keep user text safe from arbitrary string evaluation injections
                 msg.innerText = text;
             }
             
@@ -325,84 +281,42 @@
             if (ind) ind.remove();
         }
 
-        // Live API integration method wrapper - Fully CSP compliant (No eval used)
         const PROXY_URL = "https://my-ai-resume-seven.vercel.app/api";
 
-        async function handleInquiry(userText, lookupKey) {
-            // Append the message to the screen visually
+        async function handleInquiry(userText) {
             appendMessage('user', userText);
-            
-            // Push it into active memory history logs for the LLM session context
             chatContextHistory.push({ role: "user", content: userText });
-            
             appendTypingIndicator();
             
             try {
-                // Perform a clean, native network fetch to your Vercel proxy backend
                 const response = await fetch(PROXY_URL, {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ messages: chatContextHistory })
                 });
 
-                if (!response.ok) {
-                    throw new Error("API Gateway responded with an error status.");
-                }
+                if (!response.ok) throw new Error("API Gateway responded with an error status.");
 
                 const data = await response.json();
                 removeTypingIndicator();
 
-                // Extract model completion text out of standard structural payload formatting
                 const modelReply = data.choices[0].message.content;
-                
                 appendMessage('assistant', modelReply);
                 chatContextHistory.push({ role: "assistant", content: modelReply });
 
             } catch (error) {
-                console.warn("Falling back to local matrix due to endpoint block/delay:", error);
-                // Gracefully fallback to local data match matrix if network is blocked
+                console.error("Endpoint transaction issue:", error);
                 removeTypingIndicator();
-                const fallbackReply = knowledgeBase[lookupKey] || knowledgeBase["default"];
-                appendMessage('assistant', fallbackReply);
-                chatContextHistory.push({ role: "assistant", content: fallbackReply });
+                appendMessage('assistant', "I'm currently experiencing brief connectivity issues linking to my core model network. Please reach out to me via LinkedIn or email directly at vishalkhan251@gmail.com!");
             }
-
             renderPills();
         }
 
         function processCustomInput() {
             const inputFieldText = chatInput.value.trim();
             if (!inputFieldText) return;
-
-            const lowerText = inputFieldText.toLowerCase();
-            let matchedKey = "default";
-            
-            if (lowerText.includes("goal") || lowerText.includes("2026") || lowerText.includes("future")) matchedKey = "goals";
-            else if (lowerText.includes("teleperformance") || lowerText.includes("migrate") || lowerText.includes("impact")) matchedKey = "teleperformance";
-            else if (lowerText.includes("azure") || lowerText.includes("adf") || lowerText.includes("cloud")) matchedKey = "azure";
-            else if (lowerText.includes("skill") || lowerText.includes("toolkit") || lowerText.includes("stack")) matchedKey = "skills";
-            else if (lowerText.includes("interview") || lowerText.includes("schedule") || lowerText.includes("contact") || lowerText.includes("meet")) matchedKey = "interview";
-            else if (lowerText.includes("northeastern") || lowerText.includes("research") || lowerText.includes("study")) matchedKey = "northeastern";
-            else if (lowerText.includes("experience") || lowerText.includes("years") || lowerText.includes("background")) matchedKey = "experience";
-            else if (lowerText.includes("databricks") || lowerText.includes("spark")) matchedKey = "databricks";
-            else if (lowerText.includes("sql") || lowerText.includes("query") || lowerText.includes("database")) matchedKey = "sql";
-            else if (lowerText.includes("python") || lowerText.includes("programming")) matchedKey = "python";
-            else if (lowerText.includes("avant") || lowerText.includes("garde")) matchedKey = "avantgarde";
-            else if (lowerText.includes("notice") || lowerText.includes("available") || lowerText.includes("start")) matchedKey = "notice";
-            else if (lowerText.includes("visa") || lowerText.includes("right to work") || lowerText.includes("graduate route")) matchedKey = "visa";
-            else if (lowerText.includes("relocate") || lowerText.includes("location")) matchedKey = "relocation";
-            else if (lowerText.includes("llm") || lowerText.includes("large language") || lowerText.includes("rag")) matchedKey = "llm";
-            else if (lowerText.includes("house") || lowerText.includes("prediction") || lowerText.includes("regression")) matchedKey = "houseproject";
-            else if (lowerText.includes("stakeholder") || lowerText.includes("expectations")) matchedKey = "stakeholders";
-            else if (lowerText.includes("education") || lowerText.includes("degree") || lowerText.includes("master")) matchedKey = "education";
-            else if (lowerText.includes("team") || lowerText.includes("collaborate")) matchedKey = "team";
-            else if (lowerText.includes("why you") || lowerText.includes("edge") || lowerText.includes("value")) matchedKey = "hybrid";
-
             chatInput.value = '';
-            // Use the full input text for the model, passing matchedKey only as fallback
-            handleInquiry(inputFieldText, matchedKey);
+            handleInquiry(inputFieldText);
         }
 
         btnSend.onclick = processCustomInput;
