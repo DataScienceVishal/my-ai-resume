@@ -4,51 +4,48 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
 });
 
-export default async function handler(req, res) {
-    // Inject vital response headers to satisfy browser cross-origin requests
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+export default async function handler(request, response) {
+    // Inject vital response cross-origin headers
+    response.setHeader('Access-Control-Allow-Credentials', true);
+    response.setHeader('Access-Control-Allow-Origin', '*');
+    response.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+    response.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
+    if (request.method === 'OPTIONS') {
+        return response.status(200).end();
     }
 
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method tracking restriction active. Use POST requests.' });
+    if (request.method !== 'POST') {
+        return response.status(405).json({ error: 'POST requests allowed only.' });
     }
 
     try {
-        const { messages } = req.body;
-
-        if (!messages || !Array.isArray(messages)) {
-            return res.status(400).json({ error: 'Missing or corrupt payload chat history message array.' });
+        // Explicitly check for incoming payload structures
+        if (!request.body || !request.body.messages) {
+            return response.status(200).json({
+                choices: [{ message: { role: "assistant", content: "⚠️ **Frontend Error:** The message array payload is reaching the backend empty. Please check your text input handler state." } }]
+            });
         }
 
-        // Submit complete contextual history payload directly to OpenAI execution core
-        const response = await openai.chat.completions.create({
+        const { messages } = request.body;
+
+        const completion = await openai.chat.completions.create({
             model: 'gpt-4o-mini',
             messages: messages,
             temperature: 0.5
         });
 
-        // Safeguard response extraction structure
-        if (response && response.choices && response.choices[0]) {
-            return res.status(200).json(response);
-        } else {
-            return res.status(502).json({ error: 'Invalid payload response structure returned from OpenAI core.' });
-        }
+        return response.status(200).json(completion);
 
     } catch (error) {
-        console.error('Critical Production Gateway Exception:', error);
+        console.error('Core Server System Error Catch:', error);
         
-        // Return a verbose JSON payload detailing the exact failure point to your UI
-        return res.status(200).json({
+        // Render exact error text straight to your UI for transparent debugging
+        return response.status(200).json({
             choices: [{
                 message: {
                     role: "assistant",
-                    content: `⚠️ **Server API Handler Crash Details:**\n\n\`\`\`text\n${error.message || 'Unknown backend error runtime exception'}\n\`\`\`\n\nPlease ensure your OpenAI API Key is valid and your billing limit has not been reached.`
+                    content: `⚠️ **Backend Core System Exception:**\n\n\`\`\`text\n${error.message || 'Unknown runtime error'}\n\`\`\`\n\nEnsure your OPENAI_API_KEY environment variable is configured in your Vercel project settings tab.`
                 }
             }]
         });
