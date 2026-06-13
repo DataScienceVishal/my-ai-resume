@@ -1,7 +1,7 @@
 import { OpenAI } from 'openai';
 
 export const config = {
-    maxDuration: 20, // Max Vercel limits
+    maxDuration: 20, 
 };
 
 const openai = new OpenAI({
@@ -31,31 +31,33 @@ export default async function handler(request, response) {
 
         const { messages } = request.body;
 
-        // --- ATTEMPT 1: Try Primary GPT-4.1-mini ---
+        // --- ATTEMPT 1: Try Primary GPT-4.1-mini with Native Abort Signal ---
         try {
             console.log("Routing query to primary model: GPT-4.1-mini");
             
+            // Generate a real network abort signal
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 7500); // Strict 7.5 second network cutoff
+
             const completion = await openai.chat.completions.create({
                 model: 'GPT-4.1-mini', 
                 messages: messages,
                 temperature: 0.3
             }, {
-                timeout: 8000 // Crucial Fix: Hard abort at 8 seconds so the function doesn't crash
+                signal: controller.signal // Enforces hardware level request termination
             });
             
+            clearTimeout(timeoutId); // Clear timeout if model responds fast
             return response.status(200).json(completion);
 
         } catch (primaryError) {
-            console.warn("Primary model stalled or failed. Activating local failover core...", primaryError.message);
+            console.warn("Primary model stalled or timed out. Activating Gemini 2.5 Flash-Lite failover...", primaryError.message);
 
             // --- ATTEMPT 2: Failover Backup to Gemini 2.5 Flash-Lite ---
-            // Re-routing directly within the same token to GitHub's Gemini catalog
             const backupCompletion = await openai.chat.completions.create({
                 model: 'gemini-2.5-flash-lite', 
                 messages: messages,
                 temperature: 0.3
-            }, {
-                timeout: 8000 // Give the backup its own dedicated execution buffer
             });
 
             console.log("Successfully served payload via Gemini 2.5 Flash-Lite fallback pipeline.");
