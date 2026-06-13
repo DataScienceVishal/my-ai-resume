@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: 'unsafe-inline'; script-src 'self' https: 'unsafe-inline' 'unsafe-eval';">
     <title>Vishal Khan - AI Twin Executive Assistant</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
@@ -342,11 +343,19 @@
         function appendMessage(role, text) {
             const msg = document.createElement('div');
             msg.className = `message ${role}`;
+            
             if (role === 'assistant') {
-                msg.innerHTML = marked.parse(text);
+                try {
+                    // Safe execution fallback check
+                    msg.innerHTML = typeof marked !== 'undefined' ? marked.parse(text) : text;
+                } catch (e) {
+                    console.warn("Markdown engine blocked, falling back to clean text formatting.", e);
+                    msg.innerText = text;
+                }
             } else {
                 msg.innerText = text;
             }
+            
             chatMessages.appendChild(msg);
             chatMessages.scrollTop = chatMessages.scrollHeight;
             return msg;
@@ -373,12 +382,21 @@
 
             const streamTimer = setInterval(() => {
                 if (currentIndex <= rawText.length) {
-                    element.innerHTML = marked.parse(rawText.substring(0, currentIndex));
+                    const currentChunk = rawText.substring(0, currentIndex);
+                    try {
+                        element.innerHTML = typeof marked !== 'undefined' ? marked.parse(currentChunk) : currentChunk;
+                    } catch(e) {
+                        element.innerText = currentChunk;
+                    }
                     currentIndex += 3;
                     chatMessages.scrollTop = chatMessages.scrollHeight;
                 } else {
                     clearInterval(streamTimer);
-                    element.innerHTML = marked.parse(rawText);
+                    try {
+                        element.innerHTML = typeof marked !== 'undefined' ? marked.parse(rawText) : rawText;
+                    } catch(e) {
+                        element.innerText = rawText;
+                    }
                     if(processingCompleteCallback) processingCompleteCallback();
                 }
             }, intervalSpeed);
