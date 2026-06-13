@@ -1,57 +1,56 @@
-// api/chat.js
-import { OpenAI } from "openai";
+import { OpenAI } from 'openai';
 
-// Initialize the OpenAI SDK utilizing Vercel's secure environment variables
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+    apiKey: process.env.OPENAI_API_KEY
 });
 
 export default async function handler(req, res) {
-  // Enforce global CORS and Preflight handling options
-  res.setHeader("Access-Control-Allow-Credentials", true);
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS,PATCH,DELETE,POST,PUT");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
-  );
+    // Inject vital response headers to satisfy browser cross-origin requests
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 
-  // Instantly resolve browser OPTIONS preflight checks
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
-
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed. Use POST." });
-  }
-
-  try {
-    const { messages } = req.body;
-
-    if (!messages || !Array.isArray(messages)) {
-      return res.status(400).json({ error: "Invalid context payload history." });
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
     }
 
-    // Forward the chat history straight to OpenAI's production model endpoint
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // Cost-efficient, high-speed model optimal for resumes
-      messages: messages,
-      temperature: 0.7,
-    });
-
-    // Return a structured JSON response matching your frontend layout reader
-    return res.status(200).json(completion);
-
-  } catch (error) {
-    console.error("OpenAI Gateway Internal Failure:", error);
-
-    // If OpenAI directly returns a 429 rate-limit error, catch it and explain why
-    if (error.status === 429) {
-      return res.status(429).json({
-        error: "OpenAI API Quota Exceeded. Please check your developer billing dashboard balance.",
-      });
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method tracking restriction active. Use POST requests.' });
     }
 
-    return res.status(500).json({ error: error.message || "Internal server pipeline breakdown." });
-  }
+    try {
+        const { messages } = req.body;
+
+        if (!messages || !Array.isArray(messages)) {
+            return res.status(400).json({ error: 'Missing or corrupt payload chat history message array.' });
+        }
+
+        // Submit complete contextual history payload directly to OpenAI execution core
+        const response = await openai.chat.completions.create({
+            model: 'gpt-4o-mini',
+            messages: messages,
+            temperature: 0.5
+        });
+
+        // Safeguard response extraction structure
+        if (response && response.choices && response.choices[0]) {
+            return res.status(200).json(response);
+        } else {
+            return res.status(502).json({ error: 'Invalid payload response structure returned from OpenAI core.' });
+        }
+
+    } catch (error) {
+        console.error('Critical Production Gateway Exception:', error);
+        
+        // Return a verbose JSON payload detailing the exact failure point to your UI
+        return res.status(200).json({
+            choices: [{
+                message: {
+                    role: "assistant",
+                    content: `⚠️ **Server API Handler Crash Details:**\n\n\`\`\`text\n${error.message || 'Unknown backend error runtime exception'}\n\`\`\`\n\nPlease ensure your OpenAI API Key is valid and your billing limit has not been reached.`
+                }
+            }]
+        });
+    }
 }
