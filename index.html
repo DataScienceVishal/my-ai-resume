@@ -134,17 +134,24 @@
             flex-shrink: 0;
         }
 
-        /* Fixed Footer Inputs prevents dynamic viewport shifting */
+        /* Fixed Footer Inputs wrapper containing layout controls */
         .chat-input-area { 
-            padding: 16px 40px 24px 40px; 
+            padding: 16px 40px 16px 40px; 
             display: flex; 
-            gap: 12px; 
+            flex-direction: column;
+            gap: 10px; 
             background: var(--surface-color); 
             border-top: 1px solid var(--border-color); 
             flex-shrink: 0;
         }
+        .input-row {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+        }
         .chat-input { flex: 1; padding: 14px 20px; border: 1px solid var(--border-color); border-radius: 12px; font-size: 15px; outline: none; background: #f8fafc; }
         .btn-send { padding: 0 24px; background: #1e293b; color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; }
+        .disclaimer-text { font-size: 11px; color: #8a8a8a; text-align: center; font-family: sans-serif; margin-top: 2px; }
 
         .message.assistant ul, .message.assistant ol { margin-left: 20px; margin-top: 6px; display: flex; flex-direction: column; gap: 4px; }
         .message.assistant p { margin-bottom: 8px; }
@@ -182,7 +189,7 @@
             .message { max-width: 88%; padding: 12px 14px; font-size: 14px; }
             
             .suggestions-wrapper { padding: 0 16px; margin-bottom: 8px; }
-            .chat-input-area { padding: 12px 16px; }
+            .chat-input-area { padding: 12px 16px 16px 16px; }
             .chat-input { padding: 10px 14px; font-size: 14px; }
             .btn-send { padding: 0 16px; font-size: 14px; }
         }
@@ -220,15 +227,14 @@
         </div>
 
         <div class="chat-input-area">
-            <input type="text" class="chat-input" id="chatInput" placeholder="Ask a question about my background...">
-            <button class="btn-send" id="btnSend">Send</button>
+            <div class="input-row">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Ask a question about my background...">
+                <button class="btn-send" id="btnSend">Send</button>
+            </div>
+            <!-- Secure Nested Disclaimer UI Element -->
+            <p class="disclaimer-text">🤖 Vishal's Digital Twin can make mistakes. Please verify critical background milestones independently via LinkedIn.</p>
         </div>
     </div>
-
-    <!-- Subtle UI Disclaimer Alert Line -->
-    <p style="font-size: 11px; color: #8a8a8a; text-align: center; margin-top: 6px; font-family: sans-serif;">
-        🤖 Vishal's Digital Twin can make mistakes. Please verify critical background milestones independently via LinkedIn.
-    </p>
 
     <script>
         const queryPool = [
@@ -321,13 +327,13 @@
                 STRATEGIC PERSONAL NARRATIVE ANSWERS:
                 =========================================
                 1. Why did you choose to move to the UK?
-                - Coming abroad for advanced global academic pursuits has always been a lifetime goal. Moving to the UK allowed Vishal to match his technical passions with an environment at the forefront of AI research and engineering innovation.
+                - Coming abroad for advanced global academic pursuits has always been a lifetime goal. Moving to the UK allowed me to match my technical passions with an environment at the forefront of AI research and engineering innovation.
 
                 2. What drove your transition from Finance to AI/Data Engineering?
-                - Vishal started his career parsing operational datasets in advanced corporate environments utilizing Excel, analysis configurations, and macro projections. His natural curiosity about "what comes next" beyond tabular reporting led him to research advanced technical domains. This drove him to learn Python and SQL, which quickly turned into a passionate technical pursuit. He structured this transition intentionally by securing an Executive PG Program in Data Science from IIITB, followed by an MSc in Data Science, evolving into a cloud data pipeline engineer.
+                - I started my career parsing operational datasets in advanced corporate environments utilizing Excel, analysis configurations, and macro projections. My natural curiosity about "what comes next" beyond tabular reporting led me to research advanced technical domains. This drove me to learn Python and SQL, which quickly turned into a passionate technical pursuit. I structured this transition intentionally by securing an Executive PG Program in Data Science from IIITB, followed by an MSc in Data Science, evolving into a cloud data pipeline engineer.
 
                 3. Why pursue a second Master's degree in London (Northeastern London)?
-                - To build a robust foundation, Vishal's first Master's degree (from LJMU) was completed remotely while engineering production workflows. Eager for an immersive, on-campus collaborative academic experience, he sought a top-tier physical setting in London. Intellectually, he asked himself "what's next after pure data science?" This curiosity drove him straight into specialized core AI infrastructures and computing systems, leading to his enrollment at Northeastern University London.
+                - To build a robust foundation, my first Master's degree (from LJMU) was completed remotely while engineering production workflows. Eager for an immersive, on-campus collaborative academic experience, I sought a top-tier physical setting in London. Intellectually, I asked myself "what's next after pure data science?" This curiosity drove me straight into specialized core AI infrastructures and computing systems, leading to my enrollment at Northeastern University London.
                 =========================================
 
                 Keep your outputs concise, organic, adaptive, and completely tethered to these real records.`
