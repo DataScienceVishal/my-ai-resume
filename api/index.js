@@ -55,7 +55,7 @@ export default async function handler(request, response) {
 
             // --- ATTEMPT 2: Failover Backup to Gemini 2.5 Flash-Lite ---
             const backupCompletion = await openai.chat.completions.create({
-                model: 'gemini-2.5-flash-lite', 
+                model: 'google/gemini-2.5-flash-lite', 
                 messages: messages,
                 temperature: 0.3
             });
