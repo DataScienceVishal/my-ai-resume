@@ -1,0 +1,12 @@
+from fastapi import APIRouter
+
+router = APIRouter()
+
+
+@router.get("/health")
+async def health() -> dict:
+    return {
+        "status": "healthy",
+        "version": "0.2.0",
+        "service": "ai-professional-twin",
+    }
